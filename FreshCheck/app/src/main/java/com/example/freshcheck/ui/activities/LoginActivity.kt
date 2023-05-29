@@ -20,43 +20,48 @@ class LoginActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
 
-        binding.forgotPassword.setOnClickListener {
-            val intent = Intent(this, ForgotPasswordActivity::class.java)
-            startActivity(intent)
-        }
-
-        binding.tvToRegister.setOnClickListener {
-            val intent = Intent(this, RegisterActivity::class.java)
-            startActivity(intent)
-        }
-
-        binding.btnLogin.setOnClickListener {
-            val email = binding.edEmailLogin.text.toString()
-            val password = binding.edPasswordLogin.text.toString()
-
-            if (email.isEmpty()){
-                binding.edEmailLogin.error = "Email Must Be Filled In"
-                binding.edEmailLogin.requestFocus()
-                return@setOnClickListener
-            }
-
-            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
-                binding.edPasswordLogin.error = "Invalid Email"
-                binding.edPasswordLogin.requestFocus()
-                return@setOnClickListener
-            }
-
-            if (password.isEmpty()){
-                binding.edPasswordLogin.error = "Password must be filled in"
-                binding.edPasswordLogin.requestFocus()
-                return@setOnClickListener
-            }
-
-            LoginFirebase(email,password)
+        binding.apply {
+            forgotPassword.setOnClickListener { toForgotPassword() }
+            tvToRegister.setOnClickListener { toRegister() }
+            btnLogin.setOnClickListener { handleLogin() }
         }
     }
 
-    private fun LoginFirebase(email: String, password: String) {
+    private fun handleLogin() {
+        binding.apply {
+            val email = edEmailLogin.text.toString()
+            val password = edPasswordLogin.text.toString()
+
+            if (email.isEmpty()){
+                edEmailLogin.error = "Email Must Be Filled In"
+                edEmailLogin.requestFocus()
+            }
+
+            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+                edPasswordLogin.error = "Invalid Email"
+                edPasswordLogin.requestFocus()
+            }
+
+            if (password.isEmpty()){
+                edPasswordLogin.error = "Password must be filled in"
+                edPasswordLogin.requestFocus()
+            }
+
+            loginFirebase(email,password)
+        }
+    }
+
+    private fun toRegister() {
+        val intent = Intent(this, RegisterActivity::class.java)
+        startActivity(intent)
+    }
+
+    private fun toForgotPassword() {
+        val intent = Intent(this, ForgotPasswordActivity::class.java)
+        startActivity(intent)
+    }
+
+    private fun loginFirebase(email: String, password: String) {
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) {
                 if (it.isSuccessful) {
